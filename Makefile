@@ -3,11 +3,14 @@
 .PHONY: build run clean docker-build docker-run
 
 # Default Go build flags
-GOFLAGS := -trimpath
+GOFLAGS := -trimpath -ldflags "-w -s \
+ -X main.Branch=$(shell git rev-parse --abbrev-ref HEAD)\
+ -X main.Revision=$(shell git rev-list -1 HEAD)\
+ -X main.Version=$(shell git tag --points-at HEAD)"
 
 # Build settings
 BINARY := asanager
-VERSION := 1.0.0
+VERSION := 0.1.0
 
 # Docker settings
 DOCKER_IMAGE := asanager
@@ -36,7 +39,7 @@ docker-build:
 # Run Docker container
 docker-run:
 	@echo "Running Docker container..."
-	docker run -p 3000:3000 --rm $(DOCKER_IMAGE):$(DOCKER_TAG)
+	docker run -p 9193:9193 --rm $(DOCKER_IMAGE):$(DOCKER_TAG)
 
 # Build for multiple platforms
 build-all: build-linux build-darwin build-windows

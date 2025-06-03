@@ -11,9 +11,14 @@ COPY *.go ./
 COPY index.html ./
 COPY script.js ./
 COPY styles.css ./
+COPY favicon.ico ./
 
 # Build the application
-RUN go build -o asanager
+RUN go build -ldflags "-w -s \
+    -X main.Branch=$(shell git rev-parse --abbrev-ref HEAD)\
+    -X main.Revision=$(shell git rev-list -1 HEAD) \
+    -X main.Version=$(shell git tag --points-at HEAD)" \
+    -o asanager
 
 # Use a smaller base image for the final image
 FROM alpine:latest
