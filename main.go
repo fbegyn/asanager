@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"flag"
 	"io/fs"
 	"log"
@@ -14,6 +15,11 @@ import (
 
 //go:embed index.html script.js styles.css favicon.ico
 var staticFiles embed.FS
+
+type ConfigPayload struct {
+	Labels                string `json:"labels"`
+	AlertmanagerServerURL string `json:"alertmanager_url"`
+}
 
 func main() {
 	// Get configuration from environment variables or use defaults
@@ -62,10 +68,16 @@ func main() {
 	fileServer := http.FileServer(http.FS(fsys))
 	mux.Handle("/", fileServer)
 
+	cfgPayload := ConfigPayload{
+		Labels:                labelSelector,
+		AlertmanagerServerURL: alertmanagerURL,
+	}
+
 	// Add config endpoint to provide labels to the frontend
 	mux.HandleFunc("/api/config", func(w http.ResponseWriter, r *http.Request) {
+		jsonw := json.NewEncoder(w)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"labels": "` + labelSelector + `"}`))
+		jsonw.Encode(cfgPayload)
 	})
 
 	// Set up reverse proxy for Prometheus API
