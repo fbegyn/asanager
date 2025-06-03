@@ -86,7 +86,7 @@ Example:
 The application can be configured using command line flags:
 
 ```bash
-> ./amanaager --help
+> ./asanager --help
   -alertmanager-url string
      Alertmanager URL (default "http://alertmanager.foo.bar")
   -label-selector string
