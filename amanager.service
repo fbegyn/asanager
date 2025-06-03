@@ -1,0 +1,22 @@
+[Unit]
+Description=Alertmanager silence creator - asanager
+After=network.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/asanager
+Restart=on-failure
+RestartSec=5s
+Environment="PORT=9193"
+
+# Security enhancements
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/log/asanager
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
